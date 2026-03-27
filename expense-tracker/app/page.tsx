@@ -1,12 +1,38 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { parseUPIAmount, extractMerchant } from "@/lib/parser";
 import { supabase } from "@/lib/supabase";
+import RecentTransactions from "@/Components/RecentTransactions";
 
 export default function Home() {
   const [smsInput, setSmsInput] = useState("");
   const [extractedData, setExtractedData] = useState<{amount: number, merchant: string} | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [recentTransactions, setTransactions] = useState<any[]>([]);
+  const [extractionvisible, setExtractionVisible] = useState(false);
+  //function to fetch 5 recent trasactions from Database
+
+  const fetchRecentExpenses = async () => {
+    const {data, error} = await supabase
+    .from('expenses')
+    .select('*')
+    .order('created_at',{ascending: false})
+    .limit(5);
+
+    if(data) {
+      setTransactions(data);
+    }
+    else if(error) {
+      alert("Failed to fetch data");
+    }
+  };
+
+  useEffect(() => {
+    fetchRecentExpenses();
+  },[]
+  );
+
+
   const handleProcess = async () => {
     const amount = parseUPIAmount(smsInput);
     const merchant = extractMerchant(smsInput);
@@ -16,6 +42,7 @@ export default function Home() {
     if (amount) {
       setExtractedData({ amount, merchant });
       setIsSaving(true);
+      setExtractionVisible(true);
 
       //send to supabase
       const {error} = await supabase
@@ -28,7 +55,9 @@ export default function Home() {
         alert("Failed to save to database: " + error.message);
       } else {
         alert("✅ Expense saved successfully!");
-        setSmsInput(""); // Clear the box for the next text
+        setSmsInput("");
+        fetchRecentExpenses();
+        setExtractionVisible(false); // Clear the box for the next text
       }
 
     } else {
@@ -54,8 +83,8 @@ export default function Home() {
         >
           Process SMS
         </button>
-
-        {extractedData && (
+        <RecentTransactions data={recentTransactions} />
+                {extractedData && extractionvisible && (
           <div className="p-4 bg-green-900/20 border border-green-500/50 rounded-lg mt-4 animate-in fade-in slide-in-from-top-2">
             <p className="text-green-400 font-bold">Data Detected!</p>
             <p>Amount: ₹{extractedData.amount}</p>
