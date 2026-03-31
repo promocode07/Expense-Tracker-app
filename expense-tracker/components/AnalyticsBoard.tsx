@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 // 1. The Blueprint
 interface Transaction {
   amount: number;
@@ -17,6 +19,8 @@ export default function AnalyticsBoard({ transactions, budget }: AnalyticsBoardP
 
   const balance = budget - totalSpent;
 
+  const [bugdetn, setBudgetn] = useState<any>(budget);
+
 
   return (
     <div className="grid grid-cols-3 gap-4 mb-8 mt-4">
@@ -24,7 +28,11 @@ export default function AnalyticsBoard({ transactions, budget }: AnalyticsBoardP
       {/* Box 1: Budget */}
       <div className="bg-slate-900 p-4 rounded-lg border border-slate-800">
         <p className="text-slate-500 text-sm font-semibold mb-1">Budget</p>
-        <p className="text-2xl font-bold text-slate-200">₹{budget}</p>
+        <textarea 
+        className="w-full p-4 bg-slate-900 border border-slate-800 rounded-lg h-32 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-slate-200"
+        placeholder="Paste your UPI SMS here..."
+        value={budget}
+        onChange={(e) => setBudgetn(e.target.value)}></textarea>
       </div>
 
       {/* Box 2: Total Spent */}
