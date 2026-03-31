@@ -9,6 +9,7 @@ export default function Dashboard() {
   const [budget, setBudget] = useState<number>(0);
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
 
+  // ... (keep fetchSettings and fetchRecentExpenses as they are) ...
   const fetchSettings = async () => {
     const { data } = await supabase.from('user_settings').select('monthly_budget').limit(1).single();
     if (data) setBudget(data.monthly_budget);
@@ -19,11 +20,37 @@ export default function Dashboard() {
     if (data) setRecentTransactions(data);
   };
 
-  // The Dashboard manages its own data loading!
   useEffect(() => {
     fetchSettings();
     fetchRecentExpenses();
   }, []);
+
+  // NEW DATABASE LOGIC: Handle the budget update
+  const handleUpdateBudget = async (newBudget: number) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return; // Failsafe: Must be logged in
+
+    // 1. Check if they already have a settings row
+    const { data: existingSettings } = await supabase.from('user_settings').select('id').eq('user_id', user.id).single();
+
+    let error;
+    if (existingSettings) {
+      // 2. Update existing row
+      const { error: updateError } = await supabase.from('user_settings').update({ monthly_budget: newBudget }).eq('id', existingSettings.id);
+      error = updateError;
+    } else {
+      // 3. Insert new row
+      const { error: insertError } = await supabase.from('user_settings').insert([{ monthly_budget: newBudget }]);
+      error = insertError;
+    }
+
+    if (error) {
+      alert("Failed to save budget: " + error.message);
+    } else {
+      // 4. Update the local UI state so it instantly reflects the change
+      setBudget(newBudget);
+    }
+  };
 
   return (
     <div className="w-full max-w-md">
@@ -37,7 +64,9 @@ export default function Dashboard() {
         </button>
       </div>
       
-      <AnalyticsBoard transactions={recentTransactions} budget={budget} />
+      {/* Pass the new function down to the Worker! */}
+      <AnalyticsBoard transactions={recentTransactions} budget={budget} onUpdateBudget={handleUpdateBudget} />
+      
       <SmsInput onSaveSuccess={fetchRecentExpenses} />
       <RecentTransactions data={recentTransactions} />
     </div>
