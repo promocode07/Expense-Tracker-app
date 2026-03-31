@@ -11,14 +11,13 @@ interface AnalyticsBoardProps {
 // 2. The Worker
 export default function AnalyticsBoard({ transactions, budget }: AnalyticsBoardProps) {
   
-  // 3. The Math Engine (The .reduce method!)
-  // This rolls through every transaction and adds the 'amount' to a running 'sum'
+
+
   const totalSpent = transactions.reduce((sum, tx) => sum + tx.amount, 0);
-  
-  // Simple subtraction for the balance
+
   const balance = budget - totalSpent;
 
-  // 4. The UI UI
+
   return (
     <div className="grid grid-cols-3 gap-4 mb-8 mt-4">
       
