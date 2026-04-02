@@ -21,7 +21,7 @@ export default function Dashboard() {
   };
 
   const fetchAllExpenses = async () => {
-    const { data} = await supabase.from('expenses').select('*').order('created_at' {ascending:false});
+    const { data} = await supabase.from('expenses').select('*').order('created_at', {ascending:false});
     if (data)
       setAllTransactions(data);
   }
