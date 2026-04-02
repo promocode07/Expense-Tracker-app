@@ -6,6 +6,7 @@ import { useState } from "react";
 // 🧩 Transaction type (each transaction has amount)
 interface Transaction {
   amount: number;
+  totalExpenses: number;
 }
 
 // 🧩 Props for this component

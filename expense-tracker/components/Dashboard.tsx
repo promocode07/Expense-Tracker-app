@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { supabase } from "@/lib/supabase";
 import AnalyticsBoard from "@/components/AnalyticsBoard";
 import RecentTransactions from "@/components/RecentTransactions";
@@ -8,8 +8,8 @@ import SmsInput from "@/components/SmsInput";
 export default function Dashboard() {
   const [budget, setBudget] = useState<number>(0);
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
+  const [allTransactions, setAllTransactions] = useState<any[]>([]);
 
-  // ... (keep fetchSettings and fetchRecentExpenses as they are) ...
   const fetchSettings = async () => {
     const { data } = await supabase.from('user_settings').select('monthly_budget').limit(1).single();
     if (data) setBudget(data.monthly_budget);
@@ -19,6 +19,12 @@ export default function Dashboard() {
     const { data } = await supabase.from('expenses').select('*').order('created_at', { ascending: false }).limit(5);
     if (data) setRecentTransactions(data);
   };
+
+  const fetchAllExpenses = async () => {
+    const { data} = await supabase.from('expenses').select('*').order('created_at' {ascending:false});
+    if (data)
+      setAllTransactions(data);
+  }
 
   useEffect(() => {
     fetchSettings();
@@ -33,7 +39,7 @@ export default function Dashboard() {
     // 1. Check if they already have a settings row
     const { data: existingSettings } = await supabase.from('user_settings').select('id').eq('user_id', user.id).single();
 
-    let error;
+    let error; 
     if (existingSettings) {
       // 2. Update existing row
       const { error: updateError } = await supabase.from('user_settings').update({ monthly_budget: newBudget }).eq('id', existingSettings.id);
@@ -65,10 +71,10 @@ export default function Dashboard() {
       </div>
       
       {/* Pass the new function down to the Worker! */}
-      <AnalyticsBoard transactions={recentTransactions} budget={budget} onUpdateBudget={handleUpdateBudget} />
+      <AnalyticsBoard transactions={allTransactions} budget={budget} onUpdateBudget={handleUpdateBudget} />
       
       <SmsInput onSaveSuccess={fetchRecentExpenses} />
       <RecentTransactions data={recentTransactions} />
     </div>
-  );
+  ); 
 }

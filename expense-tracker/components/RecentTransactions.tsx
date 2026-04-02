@@ -7,6 +7,7 @@ interface Transactions {
 
 interface recentTransactionsProps {
     data: Transactions[];
+    
 }
 
 export default function RecentTransactions({data}: recentTransactionsProps ) {
