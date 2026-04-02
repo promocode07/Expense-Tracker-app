@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import AnalyticsBoard from "@/components/AnalyticsBoard";
 import RecentTransactions from "@/components/RecentTransactions";
@@ -8,7 +8,14 @@ import SmsInput from "@/components/SmsInput";
 export default function Dashboard() {
   const [budget, setBudget] = useState<number>(0);
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
-  const [allTransactions, setAllTransactions] = useState<any[]>([]);
+  const [allTransactions, setAllTransactions] = useState<any[]>([]); 
+
+  
+  const refreshAllData = () => {
+    fetchSettings();
+    fetchRecentExpenses();
+    fetchAllExpenses();
+  };
 
   const fetchSettings = async () => {
     const { data } = await supabase.from('user_settings').select('monthly_budget').limit(1).single();
@@ -20,32 +27,28 @@ export default function Dashboard() {
     if (data) setRecentTransactions(data);
   };
 
+  // 2. Fetch all expenses for the analytics board
   const fetchAllExpenses = async () => {
-    const { data} = await supabase.from('expenses').select('*').order('created_at', {ascending:false});
-    if (data)
-      setAllTransactions(data);
-  }
+    const { data } = await supabase.from('expenses').select('*').order('created_at', { ascending: false });
+    if (data) setAllTransactions(data);
+  };
 
+  // 3. Trigger the refresh when the page loads
   useEffect(() => {
-    fetchSettings();
-    fetchRecentExpenses();
+    refreshAllData();
   }, []);
 
-  // NEW DATABASE LOGIC: Handle the budget update
   const handleUpdateBudget = async (newBudget: number) => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return; // Failsafe: Must be logged in
+    if (!user) return;
 
-    // 1. Check if they already have a settings row
     const { data: existingSettings } = await supabase.from('user_settings').select('id').eq('user_id', user.id).single();
 
-    let error; 
+    let error;
     if (existingSettings) {
-      // 2. Update existing row
       const { error: updateError } = await supabase.from('user_settings').update({ monthly_budget: newBudget }).eq('id', existingSettings.id);
       error = updateError;
     } else {
-      // 3. Insert new row
       const { error: insertError } = await supabase.from('user_settings').insert([{ monthly_budget: newBudget }]);
       error = insertError;
     }
@@ -53,13 +56,25 @@ export default function Dashboard() {
     if (error) {
       alert("Failed to save budget: " + error.message);
     } else {
-      // 4. Update the local UI state so it instantly reflects the change
       setBudget(newBudget);
     }
   };
 
+  // 4. Restored the Delete Function
+  const handleDeleteExpense = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this expense?")) return;
+    const { error } = await supabase.from('expenses').delete().eq('id', id);
+
+    if (error) {
+      alert("Failed to delete: " + error.message);
+    } else {
+      // 5. Instantly update both the recent list AND the total board!
+      refreshAllData(); 
+    }
+  };
+
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full max-w-md pb-12">
       <div className="flex justify-between items-center mb-6 mt-8">
         <h1 className="text-3xl font-bold text-white">Expense Tracker</h1>
         <button 
@@ -70,11 +85,14 @@ export default function Dashboard() {
         </button>
       </div>
       
-      {/* Pass the new function down to the Worker! */}
+      {/* Analytics gets ALL transactions */}
       <AnalyticsBoard transactions={allTransactions} budget={budget} onUpdateBudget={handleUpdateBudget} />
       
-      <SmsInput onSaveSuccess={fetchRecentExpenses} />
+      {/* SMS Input triggers a full refresh when saved */}
+      <SmsInput onSaveSuccess={refreshAllData} />
+      
+      {/* Recent Transactions only gets the top 5, and we restored the onDelete prop */}
       <RecentTransactions data={recentTransactions} />
     </div>
-  ); 
+  );
 }
