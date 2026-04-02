@@ -76,7 +76,7 @@ export default function Dashboard() {
   return (
     <div className="w-full max-w-md pb-12">
       <div className="flex justify-between items-center mb-6 mt-8">
-        <h1 className="text-3xl font-bold text-white">Expense Tracker</h1>
+        <h1 className="text-3xl font-bold text-white">Tracker</h1>
         <button 
           onClick={() => supabase.auth.signOut()} 
           className="text-sm text-slate-400 hover:text-white"
