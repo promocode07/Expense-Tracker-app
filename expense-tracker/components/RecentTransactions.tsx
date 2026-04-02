@@ -1,21 +1,20 @@
 "use client";
 
 interface Transaction {
-    id: string;
-    merchant: string;
-    amount: number;
-    created_at: string;
+  id: string;
+  merchant: string;
+  amount: number;
+  created_at: string;
 }
 
 interface RecentTransactionsProps {
-    data: Transaction[]; 
-    // We removed 'total' because this component doesn't need to do the math!
+  data: Transaction[];
 }
 
-export default function RecentTransactions({ data }: RecentTransactionsProps ) {
-    return (
+export default function RecentTransactions({ data }: RecentTransactionsProps) {
+  return (
     <div className="mt-8 mb-8">
-      <h2 className="text-xl font-bold mb-4 text-white">Recent Spends</h2>
+      <h2 className="text-xl font-bold mb-4 text-white"> Test Spends</h2>
       <div className="space-y-3">
         {data.length === 0 ? (
           <p className="text-slate-500 text-sm">No expenses recorded yet.</p>

@@ -15,9 +15,7 @@ export default function AnalyticsBoard({ transactions, budget, onUpdateBudget }:
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(budget.toString());
 
-  // ✅ THE FIX: We add up 'tx.amount', because that matches the database column!
   const totalSpent = transactions.reduce((sum, tx) => sum + tx.amount, 0);
-  
   const balance = budget - totalSpent;
 
   const handleSave = () => {
