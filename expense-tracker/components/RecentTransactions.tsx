@@ -15,7 +15,7 @@ interface RecentTransactionsProps {
 export default function RecentTransactions({ data }: RecentTransactionsProps ) {
     return (
     <div className="mt-8 mb-8">
-      <h2 className="text-xl font-bold mb-4 text-white">Recent Spends</h2>
+      <h2 className="text-xl font-bold mb-4 text-white">Recent Transactions - latest 5</h2>
       <div className="space-y-3">
         {data.length === 0 ? (
           <p className="text-slate-500 text-sm">No expenses recorded yet.</p>
@@ -29,6 +29,7 @@ export default function RecentTransactions({ data }: RecentTransactionsProps ) {
                 </p>
               </div>
               <p className="font-bold text-red-400">- ₹{tx.amount}</p>
+              <button className="">delete</button>
             </div>
           ))
         )}
