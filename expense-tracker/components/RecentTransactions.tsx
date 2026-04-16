@@ -9,9 +9,10 @@ interface Transaction {
 
 interface RecentTransactionsProps {
   data: Transaction[];
+ onDelete: (id: string) => void;
 }
 
-export default function RecentTransactions({ data }: RecentTransactionsProps) {
+export default function RecentTransactions({ data, onDelete }: RecentTransactionsProps) {
   return (
     <div className="mt-8 mb-8">
       <h2 className="text-xl font-bold mb-4 text-white">Top 5 latest Transactions</h2>
@@ -28,6 +29,7 @@ export default function RecentTransactions({ data }: RecentTransactionsProps) {
                 </p>
               </div>
               <p className="font-bold text-red-400">- ₹{tx.amount}</p>
+              <button onClick = {() => onDelete(tx.id)} >Delete</button>
             </div>
           ))
         )}
