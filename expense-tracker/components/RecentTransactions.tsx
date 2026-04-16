@@ -29,6 +29,9 @@ export default function RecentTransactions({ data, onDelete }: RecentTransaction
                 </p>
               </div>
               <p className="font-bold text-red-400">- ₹{tx.amount}</p>
+              <button onClick={() => onDelete(tx.id)} className="text-xs text-red-500 hover:text-red-400">
+                Delete
+              </button>
             </div>
           ))
         )}
