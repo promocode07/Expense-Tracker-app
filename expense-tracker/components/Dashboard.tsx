@@ -53,19 +53,21 @@ export default function Dashboard() {
     if (error) alert("Failed to save budget: " + error.message);
     else setBudget(newBudget);
     }
-     const handleDeleteFunction = async (id: string) => {
-      if(!window.confirm("are you sure you want to delete this transaction???"))
-        return;
+    const handleDeleteFunction = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this transaction???")) return;
 
-      const {error} = await supabase.from('expenses').delete().eq('id',id);
+    
+    setRecentTransactions(prev => prev.filter(tx => tx.id !== id));
+    setAllTransactions(prev => prev.filter(tx => tx.id !== id));
 
-      if(error)
-        alert("failed to delete the selected transactions!");
-      else
-        refreshAllData();
+    const { error } = await supabase.from('expenses').delete().eq('id', id);
+
+    if (error) {
+      alert("Failed to delete the selected transaction!");
+      refreshAllData();
+    }
   };
 
- 
   return (
     <div className="w-full max-w-md pb-12">
       <div className="flex justify-between items-center mb-6 mt-8">
