@@ -92,8 +92,8 @@ export default function Dashboard() {
       
       <AnalyticsBoard transactions={allTransactions} budget={budget} onUpdateBudget={handleUpdateBudget} />
       <SmsInput onSaveSuccess={refreshAllData} />
-      <RecentTransactions data={recentTransactions} onDelete = {handleDeleteFunction} />
       <AddExpense onAdd={handleAddExpense} />
+      <RecentTransactions data={recentTransactions} onDelete = {handleDeleteFunction} />
     </div>
   );
 }
