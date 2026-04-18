@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import AnalyticsBoard from "@/components/AnalyticsBoard";
 import RecentTransactions from "@/components/RecentTransactions";
 import SmsInput from "@/components/SmsInput";
+import AddExpense from "@/components/AddExpense";
 
 export default function Dashboard() {
   const [budget, setBudget] = useState<number>(0);
@@ -30,6 +31,18 @@ export default function Dashboard() {
     const { data } = await supabase.from('expenses').select('*').order('created_at', { ascending: false });
     if (data) setAllTransactions(data);
   };
+
+  const handleAddExpense = async (merchant: string, amount: number) => {
+  const { error } = await supabase.from('expenses').insert([
+    { merchant: merchant, amount: amount }
+  ]);
+
+  if (error) {
+    alert("Failed to add expense: " + error.message);
+  } else {
+    refreshAllData();
+  }
+};
 
   useEffect(() => {
     refreshAllData();
@@ -80,6 +93,7 @@ export default function Dashboard() {
       <AnalyticsBoard transactions={allTransactions} budget={budget} onUpdateBudget={handleUpdateBudget} />
       <SmsInput onSaveSuccess={refreshAllData} />
       <RecentTransactions data={recentTransactions} onDelete = {handleDeleteFunction} />
+      <AddExpense onAdd={handleAddExpense} />
     </div>
   );
 }
