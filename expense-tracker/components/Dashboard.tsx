@@ -44,6 +44,21 @@ export default function Dashboard() {
   }
 };
 
+const handleClearTransactions = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user)
+     return;
+
+  const { error } = await supabase.from('expenses').delete().eq('user_id', user.id);
+
+  if (error) {
+    alert("Failed to clear transactions: " + error.message);
+  } 
+  else {
+    refreshAllData();
+  }
+};
+
   useEffect(() => {
     refreshAllData();
   }, []);
@@ -94,7 +109,7 @@ export default function Dashboard() {
         </button>
       </div>
       
-      <AnalyticsBoard transactions={allTransactions} budget={budget} onUpdateBudget={handleUpdateBudget} />
+      <AnalyticsBoard transactions={allTransactions} budget={budget} onUpdateBudget={handleUpdateBudget} onClearTransactions={handleClearTransactions} />
       <SmsInput onSaveSuccess={refreshAllData} />
       <AddExpense onAdd={handleAddExpense} />
       <RecentTransactions data={recentTransactions} onDelete = {handleDeleteFunction} />

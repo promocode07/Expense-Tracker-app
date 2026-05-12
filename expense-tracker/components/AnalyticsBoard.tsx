@@ -9,9 +9,10 @@ interface AnalyticsBoardProps {
   transactions: Transaction[];
   budget: number;
   onUpdateBudget: (newBudget: number) => void; 
+  onClearTransactions: () => void;
 }
 
-export default function AnalyticsBoard({ transactions, budget, onUpdateBudget }: AnalyticsBoardProps) {
+export default function AnalyticsBoard({ transactions, budget, onUpdateBudget, onClearTransactions }: AnalyticsBoardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(budget.toString());
 
@@ -21,8 +22,7 @@ export default function AnalyticsBoard({ transactions, budget, onUpdateBudget }:
   const handleSave = () => {
     onUpdateBudget(Number(editValue));
     setIsEditing(false);
-    totalSpent = 0;
-    balance = 0;
+   onClearTransactions(); 
   };
 
   return (
