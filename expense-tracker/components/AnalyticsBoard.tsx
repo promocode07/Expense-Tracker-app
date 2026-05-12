@@ -15,12 +15,14 @@ export default function AnalyticsBoard({ transactions, budget, onUpdateBudget }:
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(budget.toString());
 
-  const totalSpent = transactions.reduce((sum, tx) => sum + tx.amount, 0);
-  const balance = budget - totalSpent;
+  let totalSpent = transactions.reduce((sum, tx) => sum + tx.amount, 0);
+  let balance = budget - totalSpent;
 
   const handleSave = () => {
     onUpdateBudget(Number(editValue));
     setIsEditing(false);
+    totalSpent = 0;
+    balance = 0;
   };
 
   return (

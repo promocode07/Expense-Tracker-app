@@ -58,6 +58,7 @@ export default function Dashboard() {
     if (existingSettings) {
       const { error: updateError } = await supabase.from('user_settings').update({ monthly_budget: newBudget }).eq('id', existingSettings.id);
       error = updateError;
+
     } else {
       const { error: insertError } = await supabase.from('user_settings').insert([{ monthly_budget: newBudget }]);
       error = insertError;
@@ -65,7 +66,10 @@ export default function Dashboard() {
 
     if (error) alert("Failed to save budget: " + error.message);
     else setBudget(newBudget);
+    
     }
+
+
     const handleDeleteFunction = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this transaction???")) return;
 
